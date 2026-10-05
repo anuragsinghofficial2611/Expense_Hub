@@ -1,12 +1,9 @@
-import mongoose from 'mongoose';
+import pg from "pg";
 
-const connectDB = async () => {
-    try{ 
-        await mongoose.connect('db url');
-        console.log('db connected')
-    } catch(error){
-        console.log(error);
-    }
-}
+const { Pool } = pg;
 
-export default connectDB();
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL
+});
+
+export default pool;

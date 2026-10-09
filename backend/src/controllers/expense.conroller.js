@@ -4,9 +4,10 @@ import pool from "../config/database.js";
 
 const createExpense = async (req, res) => {
     try {
-        const { group_id, paid_by, description, amount } = req.body;
+        const paid_by = req.user.user_id;
+        const { group_id, description, amount } = req.body;
 
-        if (!group_id || !paid_by || !description || !amount) {
+        if (!group_id || !description || !amount) {
             return res.status(400).json({
                 message: "Every field is required"
             });

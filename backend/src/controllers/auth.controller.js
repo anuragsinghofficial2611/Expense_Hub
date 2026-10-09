@@ -2,7 +2,7 @@ import pool from "../config/database.js";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
-const LoginUser = async (req, res) => {
+const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -25,15 +25,15 @@ const LoginUser = async (req, res) => {
         const isPasswordvalid = bcrypt.compare(password,user.password);
         if(!isPasswordvalid){
             return res.status(40).json({
-                message: "Password is Incorrect";
+                message: "Password is Incorrect"
             });
         }
         const hashedPassword = bcrypt.hash(password,10);
 
         const token = jwt.sign(
             {
-                userId: user.id;
-                email: user.email;
+                userId: user.id,
+                email: user.email
             },
             process.env.JWT_SECRET,
             {
@@ -53,7 +53,7 @@ const LoginUser = async (req, res) => {
     }
 }
 
-const RegisterUser = async (req, res) => {
+const registerUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
@@ -75,12 +75,13 @@ const RegisterUser = async (req, res) => {
                 message: "User already exists"
             });
         }
+        const hashedPassword = await bcrypt.hash(password,10);
 
         const newUser = await pool.query(
             `INSERT INTO users (name, email, password)
              VALUES ($1, $2, $3)
              RETURNING id, name, email, created_at`,
-            [name, email, password]
+            [name, email, hashedPassword]
         );
 
         return res.status(201).json({
@@ -97,4 +98,4 @@ const RegisterUser = async (req, res) => {
     }
 };
 
-export default { LoginUser }
+export { loginUser,registerUser }

@@ -1,10 +1,11 @@
 
 import pool from "../config/database.js";
 //i have to add middleware for group_id
+//done forget currently taking group_id from frontend
 
 const createGroup = async (req, res) => {
     try {
-        const { name, description, created_by } = req.body;
+        const { name, created_by } = req.body;
 
         if (!name || !created_by) {
             return res.status(400).json({
@@ -13,12 +14,10 @@ const createGroup = async (req, res) => {
         }
 
         const result = await pool.query(
-            `INSERT INTO groups
-                (name, description, created_by)
-             VALUES
-                ($1, $2, $3)
-             RETURNING id, name, description, created_by, created_at`,
-            [name, description || null, created_by]
+            `INSERT INTO groups (name, created_by)
+         VALUES ($1, $2)
+         RETURNING id, name, created_by, created_at`,
+            [name, created_by]
         );
 
         return res.status(201).json({
@@ -30,7 +29,7 @@ const createGroup = async (req, res) => {
         console.error(error);
 
         return res.status(500).json({
-            message: "Internal server error"
+            message: "Internal server error creating group"
         });
     }
 };
